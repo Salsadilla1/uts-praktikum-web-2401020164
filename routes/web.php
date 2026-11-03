@@ -61,19 +61,40 @@ Route::get('/', function () {
     return redirect()->route('pesanan.index');
 })->name('beranda');
 
-Route::get('/pesanan-laundry', function () {
+Route::get('/pesanan-laundry', function (Request $request) {
+    $kataKunci = trim((string) $request->query('q', ''));
+    $jenisLayananId = $request->query('jenis_layanan_id', '');
+
     try {
         $pdo = DB::connection()->getPdo();
 
-        $pernyataan = $pdo->prepare(
-            'SELECT p.id, p.kode_pesanan, p.nama_pelanggan, p.nomor_telepon,
-                    p.berat_kg, p.jenis_layanan_id, j.nama_layanan
-             FROM pesanan_laundry AS p
-             JOIN jenis_layanan AS j
-               ON j.id = p.jenis_layanan_id
-             ORDER BY p.kode_pesanan'
-        );
-        $pernyataan->execute();
+        $sql = 'SELECT p.id, p.kode_pesanan, p.nama_pelanggan, p.nomor_telepon,
+                       p.berat_kg, p.jenis_layanan_id, j.nama_layanan
+                FROM pesanan_laundry AS p
+                JOIN jenis_layanan AS j
+                  ON j.id = p.jenis_layanan_id
+                WHERE 1 = 1';
+        $parameter = [];
+
+        if ($kataKunci !== '') {
+            $sql .= ' AND (p.kode_pesanan LIKE :kata_kunci_kode
+                        OR p.nama_pelanggan LIKE :kata_kunci_nama
+                        OR p.nomor_telepon LIKE :kata_kunci_telepon)';
+            $nilaiCari = '%' . $kataKunci . '%';
+            $parameter['kata_kunci_kode'] = $nilaiCari;
+            $parameter['kata_kunci_nama'] = $nilaiCari;
+            $parameter['kata_kunci_telepon'] = $nilaiCari;
+        }
+
+        if ($jenisLayananId !== '') {
+            $sql .= ' AND p.jenis_layanan_id = :jenis_layanan_id';
+            $parameter['jenis_layanan_id'] = (int) $jenisLayananId;
+        }
+
+        $sql .= ' ORDER BY p.kode_pesanan';
+
+        $pernyataan = $pdo->prepare($sql);
+        $pernyataan->execute($parameter);
         $daftarPesanan = $pernyataan->fetchAll(\PDO::FETCH_ASSOC);
 
         $pernyataanLayanan = $pdo->prepare(
@@ -86,7 +107,9 @@ Route::get('/pesanan-laundry', function () {
 
         return view('pesanan-laundry', compact(
             'daftarPesanan',
-            'daftarLayanan'
+            'daftarLayanan',
+            'kataKunci',
+            'jenisLayananId'
         ));
     } catch (\Throwable $error) {
         report($error);

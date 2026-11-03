@@ -65,6 +65,31 @@
         <button type="submit">Tambah Pesanan</button>
     </form>
 
+    <h2>Pencarian dan Filter</h2>
+
+    <form action="{{ route('pesanan.index') }}" method="GET">
+        <p>
+            Kata Kunci<br>
+            <input type="text" name="q" value="{{ $kataKunci }}">
+        </p>
+
+        <p>
+            Jenis Layanan<br>
+            <select name="jenis_layanan_id">
+                <option value="">-- Semua Jenis Layanan --</option>
+                @foreach ($daftarLayanan as $layanan)
+                    <option value="{{ $layanan['id'] }}"
+                        @selected((string) $jenisLayananId === (string) $layanan['id'])>
+                        {{ $layanan['nama_layanan'] }}
+                    </option>
+                @endforeach
+            </select>
+        </p>
+
+        <button type="submit">Cari</button>
+        <a href="{{ route('pesanan.index') }}">Reset</a>
+    </form>
+
     <h2>Daftar Pesanan</h2>
 
     <table border="1" cellpadding="6" cellspacing="0">
