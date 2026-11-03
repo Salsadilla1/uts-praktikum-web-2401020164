@@ -8,6 +8,63 @@
 <body>
     <h1>Pesanan Laundry</h1>
 
+    @if (session('berhasil'))
+        <p>{{ session('berhasil') }}</p>
+    @endif
+
+    @if (session('gagal'))
+        <p>{{ session('gagal') }}</p>
+    @endif
+
+    @if ($errors->any())
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    @endif
+
+    <h2>Tambah Pesanan</h2>
+
+    <form action="{{ route('pesanan.store') }}" method="POST">
+        @csrf
+
+        <p>
+            Kode Pesanan<br>
+            <input type="text" name="kode_pesanan" value="{{ old('kode_pesanan') }}">
+        </p>
+
+        <p>
+            Nama Pelanggan<br>
+            <input type="text" name="nama_pelanggan" value="{{ old('nama_pelanggan') }}">
+        </p>
+
+        <p>
+            Nomor Telepon<br>
+            <input type="text" name="nomor_telepon" value="{{ old('nomor_telepon') }}">
+        </p>
+
+        <p>
+            Berat (kg)<br>
+            <input type="number" name="berat_kg" value="{{ old('berat_kg') }}">
+        </p>
+
+        <p>
+            Jenis Layanan<br>
+            <select name="jenis_layanan_id">
+                <option value="">-- Pilih Jenis Layanan --</option>
+                @foreach ($daftarLayanan as $layanan)
+                    <option value="{{ $layanan['id'] }}"
+                        @selected(old('jenis_layanan_id') == $layanan['id'])>
+                        {{ $layanan['nama_layanan'] }}
+                    </option>
+                @endforeach
+            </select>
+        </p>
+
+        <button type="submit">Tambah Pesanan</button>
+    </form>
+
     <h2>Daftar Pesanan</h2>
 
     <table border="1" cellpadding="6" cellspacing="0">
