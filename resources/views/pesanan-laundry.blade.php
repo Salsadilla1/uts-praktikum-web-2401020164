@@ -90,10 +90,13 @@
                         Reguler
                     @endif
                 </td>
+                <td>
+                    <a href="{{ route('pesanan.edit', $pesanan['id']) }}">Ubah</a>
+                </td>
             </tr>
         @empty
             <tr>
-                <td colspan="6">Data pesanan tidak ditemukan.</td>
+                <td colspan="7">Data pesanan tidak ditemukan.</td>
             </tr>
         @endforelse
     </table>
