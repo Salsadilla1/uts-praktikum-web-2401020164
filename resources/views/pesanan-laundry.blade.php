@@ -75,6 +75,7 @@
             <th>Berat (kg)</th>
             <th>Jenis Layanan</th>
             <th>Status Berat</th>
+            <th>Aksi</th>
         </tr>
         @forelse ($daftarPesanan as $pesanan)
             <tr>
@@ -92,6 +93,12 @@
                 </td>
                 <td>
                     <a href="{{ route('pesanan.edit', $pesanan['id']) }}">Ubah</a>
+                    <form action="{{ route('pesanan.destroy', $pesanan['id']) }}"
+                          method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit">Hapus</button>
+                    </form>
                 </td>
             </tr>
         @empty

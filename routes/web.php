@@ -272,3 +272,33 @@ Route::put('/pesanan-laundry/{id}', function (Request $request, int $id) {
         );
     }
 })->name('pesanan.update');
+
+Route::delete('/pesanan-laundry/{id}', function (int $id) {
+    try {
+        $pdo = DB::connection()->getPdo();
+
+        $hapus = $pdo->prepare(
+            'DELETE FROM pesanan_laundry WHERE id = :id'
+        );
+        $hapus->execute(['id' => $id]);
+
+        if ($hapus->rowCount() === 0) {
+            return redirect()->route('pesanan.index')->with(
+                'gagal',
+                'Pesanan tidak ditemukan.'
+            );
+        }
+
+        return redirect()->route('pesanan.index')->with(
+            'berhasil',
+            'Pesanan berhasil dihapus.'
+        );
+    } catch (\Throwable $error) {
+        report($error);
+
+        return redirect()->route('pesanan.index')->with(
+            'gagal',
+            'Pesanan gagal dihapus. Periksa koneksi dan data.'
+        );
+    }
+})->name('pesanan.destroy');
